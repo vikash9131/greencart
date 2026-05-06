@@ -1,25 +1,25 @@
 import jwt from 'jsonwebtoken';
+import cookieParser from "cookie-parser";
+// app.use(cookieParser());
 
-const authUser = async (req, res, next)=>{
-    console.log("Cookies:", req.cookies); 
-    const {token} = req.cookies;
+const authUser = async (req, res, next) => {
+  console.log("Cookies:", req.cookies);
 
-    if(!token){
-        return res.json({ success: false, message: 'Not Authorized' });
-    }
+  const token = req.cookies.token;
 
-    try {
-        const tokenDecode = jwt.verify(token, process.env.JWT_SECRET)
-        if(tokenDecode.id){
-            req.body.userId = tokenDecode.id;
-        }else{
-            return res.json({ success: false, message: 'Not Authorized' });
-        }
-        next();
+  if (!token) {
+    return res.json({ success: false, message: "Not Authorized" });
+  }
 
-    } catch (error) {
-        res.json({ success: false, message: error.message });
-    }
-}
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.body.userId = decoded.id;
+    next();
+
+  } catch (error) {
+    return res.json({ success: false, message: error.message });
+  }
+};
 
 export default authUser;

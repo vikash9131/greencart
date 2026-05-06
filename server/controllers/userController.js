@@ -38,46 +38,81 @@ export const register = async (req, res)=>{
 
 // Login User : /api/user/login
 
-export const login = async (req, res)=>{
-    try {
-        const { email, password } = req.body;
+// export const login = async (req, res)=>{
+//     try {
+//         const { email, password } = req.body;
 
-        if(!email || !password)
-            return res.json({success: false, message: 'Email and password are required'});
-        const user = await User.findOne({email});
+//         if(!email || !password)
+//             return res.json({success: false, message: 'Email and password are required'});
+//         const user = await User.findOne({email});
 
-        if(!user){
-            return res.json({success: false, message: 'Invalid email or password'});
-        }
+//         if(!user){
+//             return res.json({success: false, message: 'Invalid email or password'});
+//         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
+//         const isMatch = await bcrypt.compare(password, user.password)
 
-        if(!isMatch)
-            return res.json({success: false, message: 'Invalid email or password'});
+//         if(!isMatch)
+//             return res.json({success: false, message: 'Invalid email or password'});
 
-        const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
+//         const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '7d'});
 
-        // res.cookie('token', token, {
-        //     httpOnly: true, 
-        //     secure: process.env.NODE_ENV === 'production',
-        //     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        //     maxAge: 7 * 24 * 60 * 60 * 1000,
-        // })
+//         // res.cookie('token', token, {
+//         //     httpOnly: true, 
+//         //     secure: process.env.NODE_ENV === 'production',
+//         //     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+//         //     maxAge: 7 * 24 * 60 * 60 * 1000,
+//         // })
 
-        res.cookie('token', token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: "none",
-                maxAge: 7 * 24 * 60 * 60 * 1000,
-            });
+//         res.cookie('token', token, {
+//                 httpOnly: true,
+//                 secure: true,
+//                 sameSite: "none",
+//                 maxAge: 7 * 24 * 60 * 60 * 1000,
+//             });
 
-        return res.json({success: true, user: {email: user.email, name: user.name}})
-    } catch (error) {
-        console.log(error.message);
-        res.json({ success: false, message: error.message });
+//         return res.json({success: true, user: {email: user.email, name: user.name}})
+//     } catch (error) {
+//         console.log(error.message);
+//         res.json({ success: false, message: error.message });
+//     }
+// }
+// import jwt from "jsonwebtoken";
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 🔸 your user validation logic here
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
     }
-}
 
+    // 🔸 check password (example)
+    // const isMatch = await bcrypt.compare(password, user.password);
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    // 🔥 FINAL COOKIE FIX
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,        // ✅ REQUIRED for HTTPS (Vercel)
+      sameSite: "none",    // ✅ REQUIRED for cross-origin
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    return res.json({ success: true, message: "Login successful" });
+
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+  }
+};
 
 // Check Auth : /api/user/is-auth
 export const isAuth = async (req, res)=>{
