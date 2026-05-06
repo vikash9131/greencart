@@ -113,22 +113,18 @@ await connectCloudinary();
 // ✅ CORS
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://greencart-six-iota.vercel.app",
-  "https://greencart-ky9wbsnll-vikash9131s-projects.vercel.app"
+  "https://greencart-six-iota.vercel.app"
 ];
 
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
 
-    const allowed =
-      origin.includes("localhost") ||
-      origin.endsWith(".vercel.app");
-
-    if (allowed) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      // IMPORTANT: do NOT throw error
+      callback(null, false);
     }
   },
   credentials: true,
@@ -156,8 +152,5 @@ app.use('/api/address', addressRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/policy', policyRouter);
 
-// start server
-// app.listen(port, () => {
-//     console.log(`Server is running on http://localhost:${port}`);
-// });
+
 export default app;
