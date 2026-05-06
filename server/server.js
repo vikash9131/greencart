@@ -157,6 +157,7 @@ app.use('/api/order', orderRouter);
 app.use('/api/policy', policyRouter);
 
 // start server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//     console.log(`Server is running on http://localhost:${port}`);
+// });
+export default app;
