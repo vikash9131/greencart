@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import cookieParser from "cookie-parser";
-// app.use(cookieParser());
+
 
 const authUser = async (req, res, next) => {
   console.log("Cookies:", req.cookies);
