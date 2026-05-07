@@ -317,7 +317,7 @@ const Faqs = () => {
         <div className="bg-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
           <div className="text-2xl mb-1">📞</div>
           <p className="text-xs text-gray-500">Call Us</p>
-          <p className="text-sm font-medium">+91 98765 43210</p>
+          <p className="text-sm font-medium">+91 8235231209</p>
         </div>
         <div className="bg-white rounded-xl p-4 text-center border border-gray-100 shadow-sm">
           <div className="text-2xl mb-1">⏰</div>
