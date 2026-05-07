@@ -183,6 +183,7 @@ import { stripeWebhooks } from './controllers/orderController.js';
 import policyRouter from "./routes/policyRoute.js";
 
 const app = express();
+app.set("trust proxy", 1);
 
 const port = process.env.PORT || 4000;
 
