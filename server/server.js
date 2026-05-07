@@ -88,11 +88,90 @@
 // // const server = app.listen(port, () => {
 // //     console.log("Server actually listening on:", server.address());
 // // });
+// import cookieParser from 'cookie-parser';
+// import express from 'express';
+// import cors from 'cors';
+// import connectDB from './configs/db.js';
+// import 'dotenv/config';
+// import userRouter from './routes/userRoute.js';
+// import sellerRouter from './routes/sellerRoute.js';
+// import connectCloudinary from './configs/cloudinary.js';
+// import productRouter from './routes/productRoute.js';
+// import cartRouter from './routes/cartRoute.js';
+// import addressRouter from './routes/addressRoute.js';
+// import orderRouter from './routes/orderRoute.js';
+// import { stripeWebhooks } from './controllers/orderController.js';
+// import policyRouter from "./routes/policyRoute.js";
+
+// const app = express();
+
+// const port = process.env.PORT || 4000;
+
+// await connectDB();
+// await connectCloudinary();
+
+// // ✅ CORS
+// const allowedOrigins = [
+//   "http://localhost:5173",
+//   "https://greencart-six-iota.vercel.app",
+//   "https://greencart-jiappi8wb-vikash9131s-projects.vercel.app"
+// ];
+
+// app.use(cors({
+//   origin: function(origin, callback){
+
+//     if(!origin) return callback(null, true);
+
+//     if(
+//       origin === "http://localhost:5173" ||
+//       origin.endsWith(".vercel.app")
+//     ){
+//       return callback(null, true);
+//     }
+
+//     return callback(null, false);
+//   },
+
+//   credentials: true,
+//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   allowedHeaders: [
+//     "Content-Type",
+//     "Authorization",
+//     "Cookie"
+//   ]
+// }));
+
+// // ⚠️ STRIPE ROUTE FIRST (IMPORTANT)
+// app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
+
+// // middlewares
+// app.use(cors(corsOptions));
+// app.options("*", cors(corsOptions));
+
+// app.use(express.json());
+// app.use(cookieParser());
+
+// // routes
+// app.get('/', (req, res) => res.send("API is Working"));
+// app.use('/api/user', userRouter);
+// app.use('/api/seller', sellerRouter);
+// app.use('/api/product', productRouter);
+// app.use('/api/cart', cartRouter);
+// app.use('/api/address', addressRouter);
+// app.use('/api/order', orderRouter);
+// app.use('/api/policy', policyRouter);
+
+// app.listen(port, () => {
+//   console.log(`Server is running on port ${port}`);
+// });
+// export default app;
+
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import cors from 'cors';
 import connectDB from './configs/db.js';
 import 'dotenv/config';
+
 import userRouter from './routes/userRoute.js';
 import sellerRouter from './routes/sellerRoute.js';
 import connectCloudinary from './configs/cloudinary.js';
@@ -111,39 +190,45 @@ await connectDB();
 await connectCloudinary();
 
 // ✅ CORS
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://greencart-six-iota.vercel.app"
-];
+app.use(cors({
+  origin: function(origin, callback){
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+    if(!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // IMPORTANT: do NOT throw error
-      callback(null, false);
+    if(
+      origin === "http://localhost:5173" ||
+      origin.endsWith(".vercel.app")
+    ){
+      return callback(null, true);
     }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
-};
 
-// ⚠️ STRIPE ROUTE FIRST (IMPORTANT)
-app.post('/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
+    return callback(null, false);
+  },
+
+  credentials: true,
+
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "Cookie"
+  ]
+}));
+
+// ⚠️ STRIPE ROUTE FIRST
+app.post('/stripe',
+  express.raw({ type: 'application/json' }),
+  stripeWebhooks
+);
 
 // middlewares
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
-
 app.use(express.json());
 app.use(cookieParser());
 
 // routes
 app.get('/', (req, res) => res.send("API is Working"));
+
 app.use('/api/user', userRouter);
 app.use('/api/seller', sellerRouter);
 app.use('/api/product', productRouter);
@@ -155,4 +240,5 @@ app.use('/api/policy', policyRouter);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
 export default app;
